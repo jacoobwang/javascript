@@ -1,0 +1,193 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;">
+<link type="text/css" rel="stylesheet" href="css/list.css">
+</head>
+<body>
+	<div class="topbar">
+        <a class="brand" href="#home">Jacoob's Mobile Blog----Welcome To Here</a>
+        <a class="home pull-right" href="#home"><i class="i iF iF4"></i></a>
+    </div>
+    <div id="content_container">
+        <div id="loader" class="startup">
+            <div class="loader">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div id="post_list">
+            <!-- post inside here -->
+        </div>
+        <div id="post_detail">
+            <!-- post inside here -->
+        </div>
+        <div id="nexter" class="next_page">
+            点击加载更多
+        </div>
+        <div class="to_top transparent radius">Top</div>
+    </div>
+
+    <div id="footer">
+    </div>
+
+    <!-- 列表页 -->
+    <script type="text/template" id="post-list-template">
+        <a href="#/post/<%= id %>">
+            <div class="line">
+                <div class="title"><%= title %></div>
+                <div class="image"><img src="http://fpoimg.com/90x60" /></div>
+                <div class="row small-font">
+                    <span>分类:<%= category %></span>
+                    <span>发布于:<%= create_time %></span>
+                </div>
+            </div>
+        </a>
+    </script>
+
+    <!-- 正文页 -->
+    <script type="text/template" id="post-template">
+        <div id="detail">
+            <h4><%= title %></h4>
+            <div class="small-font">
+                <div class="span">分类:<%= category %></div>
+                <div class="span">发布于:<%= create_time %></div>
+            </div>
+            <div class="clear"></div>
+            <div id="content">
+                <%= content_html %>
+            </div>
+            <div class="nav">
+                <div class="prev radius" data-curid="<%= id %>">上一篇</div>
+                <div class="next pull-right radius" data-curid="<%= id %>">下一篇</div>
+            </div>
+            <div class="clear"></div>
+            <div class="to_top transparent radius">Top</div>
+        </div>
+    </script>
+</body>
+<script src="js/jquery-1.8.1.min.js"></script>
+<script src="js/underscore-min.js"></script>
+<script src="js/backbone-min.js"></script>
+<script type="text/javascript">
+	(function($){
+		var PostView = Backbone.View.extend({
+			tagName : "dl",
+			listTemplate: _.template($('#post-list-template').html()),
+			singleTemplate:_.template($('#post-template').html()),
+			// 渲染列表页模板
+	        renderForList: function() {
+	          $(this.el).html(this.listTemplate(this.model.toJSON()));
+	          return this;
+	        },
+		renderSinglePage: function(){
+		  $(this.el).html(this.singleTemplate(this.model.toJSON()));
+  		  return this;		  
+		}
+
+		});
+
+		var Post = Backbone.Model.extend({
+			urlRoot: 'http://localhost:8080/api.php',
+	    	});
+
+	    var PostList = Backbone.Collection.extend({
+		url: 'http://localhost:8080/api.php',
+	        model: Post,
+
+	        getIncPost: function(curid, increment){
+	            var post = this.get(curid);
+	            var index = this.indexOf(post);
+	            var incPost = this.at(index + increment);
+	            // 获得后面的一个post对象，如果没有,那么当前id - 增量用于后面计算
+	            return incPost ? incPost : curid - increment;
+	        }
+	    });
+	    var Posts = new PostList;
+
+	    var AppView = Backbone.View.extend({
+	        el: $("#content_container"),
+	        post_list: $("#post_list"),
+	        post_detail: $("#post_detail"),
+	        loader: $('#loader'),
+
+	        initialize: function() {
+	          //下面这个是underscore库中的方法，用来绑定方法到目前的这个对象中，是为了在以后运行环境中调用当前对象的时候能够找到对象中的这些方法。
+	          _.bindAll(this, 'reset', 'addOne', 'addAll', 'render');
+
+	          Posts.bind('add',     this.addOne);
+	          Posts.bind('reset',   this.reset);
+	          Posts.bind('all',     this.render);
+
+	          Posts.fetch({reset: true});  // 设置fetch完之后reset
+	          this.loadRounter = false;
+	        },
+
+		render: function(){
+		   console.log('app view');
+		},
+
+	        addOne: function(post) {		
+	          var view = new PostView({model: post});
+	          this.post_list.append(view.renderForList().el);
+	        },
+
+	        addAll: function() {
+	            Posts.each(this.addOne);
+	        },
+
+	        reset: function(){
+	            this.addAll();
+	            if(!this.loadRounter){
+	                // 激活路由
+	                this.loadRounter = true;
+	                this.app_router = new AppRouter;
+	                Backbone.history.start();
+	            }
+		    this.loader.hide();
+	        },
+
+	        // 正文页渲染, 接受post对象和字符串id
+	        renderPost: function(obj){
+	            var post = typeof(obj) == 'object' ? obj : Posts.get(obj);
+	            if(post == undefined){
+	                post = new Post({id: obj});
+	                var _ = this;
+	                post.fetch({success: function(resp){
+	                   _.renderPost(resp); 
+	                }});
+	                return;
+	            }
+	            var view = new PostView({model: post});
+	            this.post_list.hide();
+	            this.post_detail.html(view.renderSinglePage().el).show();
+	            this.loader.hide();
+	            $('#nexter').hide();
+	            this.app_router.navigate("post/" + post.id);
+	        }
+    	});
+
+		var App = new AppView;
+
+	    var AppRouter = Backbone.Router.extend({
+	        routes: {
+	            "home": "home",
+	            "post/:id" : "showPost",
+	        },
+
+	        home: function(){
+	            App.loader.hide();
+	            App.post_detail.hide();
+	            App.post_list.show();
+	            $('#nexter').show();
+	        },
+
+	        showPost: function(id) {
+	            App.loader.show();
+	            App.renderPost(id);
+	        }
+	    });
+	})(jQuery);
+</script>
+</html>

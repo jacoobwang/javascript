@@ -6,8 +6,11 @@
 </head>
 <body>
 	<div class="topbar">
-        <a class="brand" href="#home">Jacoob's Mobile Blog----Welcome To Here</a>
-        <a class="home pull-right" href="#home"><i class="i iF iF4"></i></a>
+        <div class="word-icon">读</div>
+        <div class="user-link">
+        	<a class="home pull-right" href="#home">登录</a>
+        	<a class="" href="">注册</a>
+        </div>
     </div>
     <div id="content_container">
         <div id="loader" class="startup">
@@ -33,34 +36,33 @@
     </div>
 
     <!-- 列表页 -->
-    <script type="text/template" id="post-list-template">
-        <a href="#/post/<%= id %>">
-            <div class="line">
-                <div class="title"><%= title %></div>
-                <div class="image"><img src="http://fpoimg.com/90x60" /></div>
-                <div class="row small-font">
-                    <span>分类:<%= category %></span>
-                    <span>发布于:<%= create_time %></span>
-                </div>
+    <script type="text/template" id="post-list-template">  
+        <div class="line">
+        	<a class="wrap-img" href="#/post/<%= id %>"><img src="http://fpoimg.com/100x100"></a>
+        	<div class="list-top">
+        		<a class="blue-link small-font">诺然xyz2</a><em>·</em>
+        		<span class="time">1天之前</span>
+        	</div>
+            <a href="#/post/<%= id %>"><div class="title"><%= title %></div></a>
+        
+            <div class="row">
+                <span>阅读:<%= read %></span>
+                <span>喜欢:<%= like %></span>
             </div>
-        </a>
+        </div>
     </script>
 
     <!-- 正文页 -->
     <script type="text/template" id="post-template">
-        <div id="detail">
+        <div id="detail" class="post_detail">
             <h4><%= title %></h4>
             <div class="small-font">
-                <div class="span">分类:<%= category %></div>
-                <div class="span">发布于:<%= create_time %></div>
+                <span class="span">分类:<%= read %></span>
+                <span class="span">发布于:<%= like %></span>
             </div>
             <div class="clear"></div>
             <div id="content">
                 <%= content_html %>
-            </div>
-            <div class="nav">
-                <div class="prev radius" data-curid="<%= id %>">上一篇</div>
-                <div class="next pull-right radius" data-curid="<%= id %>">下一篇</div>
             </div>
             <div class="clear"></div>
             <div class="to_top transparent radius">Top</div>
@@ -88,12 +90,10 @@
 
 		});
 
-		var Post = Backbone.Model.extend({
-			urlRoot: 'http://localhost:8080/api.php',
-	    	});
+		var Post = Backbone.Model.extend({});
 
 	    var PostList = Backbone.Collection.extend({
-		url: 'http://localhost:8080/api.php',
+			url: 'api.php',
 	        model: Post,
 
 	        getIncPost: function(curid, increment){

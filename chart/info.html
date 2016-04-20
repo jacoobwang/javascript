@@ -1,0 +1,241 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>ECD-任务管理系统</title>
+    <meta name="renderer" content="webkit">
+    <style type="text/css">
+    	html{overflow-y: scroll;}
+        body,h1{
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: Microsoft YaHei;
+        }
+        a,a:hover{
+            text-decoration: none;
+            color: #FFF;
+        }
+        ul li{list-style: none;width: 100%;height:auto;display: block;position: relative;}
+        ul{margin: 0;padding: 0;}
+        .yellow{color: #fe7a0b;}
+        .border{margin-top:30px;border-bottom:1px solid #ccc;}
+        .ui_hd{
+            display: block;
+            width: 100%;
+            height: 65px;
+            background: #404040 repeat-x 0 0;
+            margin: 0;
+            padding: 0;
+        }
+        .ui_bd{
+            margin: 0;
+            padding: 0;
+        }
+        .ui_logo{
+            width: 200px;
+            height: 65px;
+            float: left;
+        }
+        .ui_userinfo{
+            float: right;
+            margin-right: 20px;
+        }
+        .ui_userinfo_lk {
+            display: inline-block;
+            width: 58px;
+            height: 65px;
+            padding-right: 20px;
+        }
+        .ui_userinfo_lk::after {
+            display: block;
+            float: right;
+            content: " ";
+            width: 9px;
+            height: 5px;
+            margin-top: 28px;
+            background: url('ui/img/ico_userinfo.png') no-repeat 0 0;
+        }
+        .ui_userinfo_list {
+            position: absolute;
+            right: 10px;
+            top: 65px;
+            z-index:100;
+            padding: 5px 0;
+            min-width: 100px;
+            border-radius: 0 0 3px 3px;
+            background-color: #3D3D3D;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+            opacity: 0;
+            -webkit-transition: all 200ms ease-in-out;
+        }
+        .ui_userinfo_list a{
+            padding: 0 15px;
+            line-height: 28px;
+            white-space: nowrap;
+        }
+        .ui_userinfo_avatar {
+            display: block;
+            float: left;
+            margin-top: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 3px;
+            background-color: #CCC;
+            background-size: 100% 100%;
+            -webkit-box-shadow: 0 1px 0 rgba(82,82,82,1),inset 0 2px 2px rgba(0,0,0,0.5);
+        }
+        .ui_userinfo:hover .ui_userinfo_list{
+            visibility:visible;
+            opacity:1;
+        }
+        .ui_logo h1 img{
+            margin-top: 25px;
+            margin-left: 20px;
+        }
+        .ui_bd{
+        	width: 100%;
+        	height: auto;
+        	display: block;
+        }
+        .form{
+        	width: 1100px;
+        	margin: 0 auto;
+        	margin-top: 50px;
+        }
+        .query{
+        	width: 1100px;
+        	margin: 20px auto;
+        }
+        .form .title{
+        	font-family: Microsoft YaHei;
+        	font-size: 24px;
+        	color: #212020;
+        }
+        .input{
+        	margin-top: 25px;
+        }
+        .input input{
+        	height: 30px;
+        	line-height: 30px;
+        	font-size: 16px;
+        	text-indent: 5px;
+        	padding: 0;
+        	border: 1px solid #ccc;
+        	outline:0;
+        }
+        .input .js_search_word{
+        	width: 600px;
+        }
+        .input .js_search_btn{
+        	width: 138px;
+        	height: 32px;
+        	margin-left: -9px;
+        	color: white;
+        	cursor:pointer;
+        	background: #757575;
+        	border:0; 
+        }
+        .baseInfo .fr{
+        	height: 85px;
+        	margin-top: 25px;
+        }
+        .baseInfo .fr .pic{
+        	float: left;	
+        	width: 90px;
+        }
+        .baseInfo .fr .attritube{
+        	float: left;
+        	color: #313131;
+        }
+        .baseInfo .fr .attritube h4{
+        	margin: 0;
+        	margin-top: 15px;
+        	font-size: 20px;
+        	font-weight: normal;
+        }
+        .baseInfo .fr .attritube p{
+        	margin-top: 5px;
+        }
+        .baseInfo .fr .attritube span{
+        	padding-right: 20px;
+        	font-size: 14px;
+        }
+        .baseInfo p{
+        	font-size: 14px;
+        	color: #333333;
+        }
+        .baseInfo p label{
+        	padding-right: 5px;
+        }
+        .ui_loading{position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:url("ui/img/loading.gif") no-repeat 50% 50%;}
+    </style>
+</head>
+<body>
+	<div class="ui_hd">
+	    <div class="ui_logo">
+	        <h1><a href="http://ecp.jd.com/" title="ECD-任务管理系统"><img src="img/logo.png" alt="ECD-Task" /></a></h1>
+	    </div>
+	    <div class="ui_userinfo">
+	        <a href="javascript:;" class="ui_userinfo_lk"><span id="js_user_photo" class="ui_userinfo_avatar"></span></a>
+	        <div class="ui_userinfo_list">
+	            <a id="js_logout" href="javascript:;">退出</a>
+	        </div>
+	    </div>
+	</div>
+	<div class="ui_bd">
+		<div class="form">
+			<div class="title">ECP注册用户信息查询</div>
+			<div class="input">
+				<input class="js_search_word" type="text" value="" />
+				<input class="js_search_btn" type="button" value="搜索" />
+			</div>
+		</div>	
+		<div class="query">
+			<div class="baseInfo">
+			</div>	
+		</div>
+		<div class="border" style="display: none;"></div>
+		<div class="query" id="container"></div>
+		<div class="border" style="display: none;"></div>
+		<div class="query" id="container2"></div>
+		<div class="border" style="display: none;"></div>
+		<div class="query" id="container3"></div>
+	</div>
+</body>
+<script id="js_top_tpl" type="text/template">
+	{{#user}}
+		<div class="fr">
+			<div class="pic"><img src="img/head_pic.png" /></div>
+			<div class="attritube"><h4>{{realname}}</h4><p><span>E:{{mail}}}</span><span>T:{{phone}}}</span><span>Q:{{qq}}</span></p></div>
+		</div>
+		<p>
+			<label>所在部门:</label>{{organization}}
+		</p>
+		<p>
+			<label>需求总量:</label><span class="yellow">{{total}}</span>
+		</p>
+		<p>
+			<label>临需数量:</label><span class="yellow">5/10%(占临需数量的百分比)</span>
+		</p>
+		<p>
+			<label>总&nbsp;&nbsp;金&nbsp;额:</label><span class="yellow">554780 第25位按中心报名</span>
+		</p>
+		<p>
+			<label>注册日期:</label>{{first}}
+		</p>
+		<p>
+			<label>最近登录:</label>{{last}}
+		</p>
+		<p>
+			<label>登录次数:</label><span class="yellow">{{login}}</span>
+		</p>
+	{{/user}}
+</script>
+<script src="js/libs/sea.js"></script>
+<script type="text/javascript">
+    seajs.use('./js/ecp.main',function(main){
+        main.load('ecp.info');
+    })
+</script>
+</html>	    
